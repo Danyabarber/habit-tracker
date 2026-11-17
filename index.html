@@ -2,30 +2,48 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Трекер привычек</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Подключаем красивый шрифт Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Подключаем иконки от Google (Material Symbols) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
+    
+    <!-- Подключаем наши стили -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Главный контейнер приложения (выглядит как экран телефона) -->
     <div class="app-container">
         
-        <!-- ЭКРАН 1: ГЛАВНАЯ -->
+        <!-- ================= ЭКРАН 1: ГЛАВНАЯ ================= -->
         <section id="screen-home" class="screen active">
             <header class="top-bar">
-                <div class="date-display">Сегодня, <span id="current-date"></span></div>
-                <div class="avatar">Д</div>
+                <!-- ТУТ ИЗМЕНЕНИЕ: Добавили id="open-calendar-btn", чтобы по клику открывался календарь -->
+                <div class="date-display" id="open-calendar-btn">
+                    Сегодня, <span id="current-date"></span>
+                </div>
+                <div class="header-actions">
+                    <!-- Кнопка переключения темы (луна/солнце) -->
+                    <button id="theme-toggle" class="theme-btn">
+                        <span class="material-symbols-rounded">dark_mode</span>
+                    </button>
+                    <!-- Аватарка для перехода в профиль -->
+                    <div class="avatar" id="profile-btn">Д</div>
+                </div>
             </header>
 
             <h1 class="page-title">Привычки</h1>
 
+            <!-- Карточка с общим прогрессом за сегодня -->
             <div class="progress-card">
                 <div class="progress-info">
                     <h2 id="daily-progress-text">0/0</h2>
                     <p>выполнено сегодня</p>
                 </div>
+                <!-- Кружок прогресса (сделан через SVG) -->
                 <div class="circular-progress">
                     <svg viewBox="0 0 36 36">
                         <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
@@ -34,16 +52,15 @@
                 </div>
             </div>
 
-            <main id="habits-container" class="habits-list">
-                <!-- Сюда JS рендерит карточки -->
-            </main>
+            <!-- Сюда JS будет добавлять карточки привычек -->
+            <main id="habits-container" class="habits-list"></main>
         </section>
 
-        <!-- ЭКРАН 2: СТАТИСТИКА -->
+        <!-- ================= ЭКРАН 2: СТАТИСТИКА ================= -->
         <section id="screen-stats" class="screen">
             <header class="top-bar">
                 <div class="date-display">Ваш прогресс</div>
-                <div class="avatar">Д</div>
+                <div class="avatar" id="profile-btn-stats">Д</div>
             </header>
 
             <h1 class="page-title">Статистика</h1>
@@ -81,81 +98,148 @@
             </div>
 
             <h3 class="section-title">Лучшие привычки</h3>
-            <div id="best-habits-container" class="best-habits-list">
-                <!-- Сюда JS рендерит лучшие привычки -->
+            <div id="best-habits-container" class="best-habits-list"></div>
+        </section>
+
+        <!-- ================= ЭКРАН 3: КАЛЕНДАРЬ ================= -->
+        <section id="screen-calendar" class="screen">
+            <header class="top-bar">
+                <div class="date-display">Календарь</div>
+                <div class="avatar" id="profile-btn-cal">Д</div>
+            </header>
+
+            <h1 class="page-title">Календарь</h1>
+
+            <div class="calendar-card">
+                <div class="calendar-header">
+                    <h3 id="calendar-month-year">Месяц</h3>
+                </div>
+                <div class="calendar-weekdays">
+                    <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+                </div>
+                <!-- Сюда JS будет вставлять числа месяца -->
+                <div class="calendar-days" id="calendar-days"></div>
+            </div>
+            <p class="calendar-hint">Зеленым отмечены дни с выполненными привычками.</p>
+        </section>
+
+        <!-- ================= ЭКРАН 4: ИСТОРИЯ ================= -->
+        <section id="screen-history" class="screen">
+            <header class="top-bar">
+                <div class="date-display">История</div>
+                <div class="avatar" id="profile-btn-hist">Д</div>
+            </header>
+
+            <h1 class="page-title">История</h1>
+
+            <!-- Сюда JS будет вставлять список выполненных дел по датам -->
+            <div id="history-container" class="history-list"></div>
+        </section>
+
+        <!-- ================= ЭКРАН 5: ПРОФИЛЬ ================= -->
+        <section id="screen-profile" class="screen">
+            <header class="top-bar">
+                <div class="date-display">Профиль</div>
+            </header>
+
+            <h1 class="page-title">Профиль</h1>
+
+            <div class="profile-card">
+                <div class="profile-avatar">Д</div>
+                <h2>Даниил</h2>
+                <p class="profile-email">student@example.com</p>
+                
+                <div class="profile-stats-row">
+                    <div class="profile-stat">
+                        <h3 id="profile-total-habits">0</h3>
+                        <p>Привычек</p>
+                    </div>
+                    <div class="profile-stat">
+                        <h3 id="profile-total-completions">0</h3>
+                        <p>Выполнений</p>
+                    </div>
+                </div>
+
+                <button id="reset-data-btn" class="btn-danger">Сбросить все данные</button>
             </div>
         </section>
 
-        <!-- Нижнее меню -->
+        <!-- МЕНЮ НАВИГАЦИИ (внизу экрана) -->
         <nav class="bottom-nav">
             <a href="#" class="nav-item active" data-target="screen-home">
-                <span class="icon">🏠</span>
-                <span>Главная</span>
+                <span class="material-symbols-rounded icon">home</span><span>Главная</span>
             </a>
             <a href="#" class="nav-item" data-target="screen-stats">
-                <span class="icon">📊</span>
-                <span>Статистика</span>
+                <span class="material-symbols-rounded icon">bar_chart</span><span>Статистика</span>
             </a>
-            <a href="#" class="nav-item">
-                <span class="icon">📅</span>
-                <span>Календарь</span>
+            <a href="#" class="nav-item" data-target="screen-calendar">
+                <span class="material-symbols-rounded icon">calendar_month</span><span>Календарь</span>
             </a>
+            <a href="#" class="nav-item" data-target="screen-history">
+                <span class="material-symbols-rounded icon">history</span><span>История</span>
+            </a>
+            <!-- Кнопка плюс для добавления привычки -->
             <div class="nav-item add-btn-wrapper">
-                <button id="open-modal-btn" class="fab">+</button>
+                <button id="open-modal-btn" class="fab">
+                    <span class="material-symbols-rounded">add</span>
+                </button>
             </div>
         </nav>
     </div>
 
-    <!-- Модалка добавления привычки -->
+    <!-- МОДАЛЬНОЕ ОКНО ДОБАВЛЕНИЯ (появляется при нажатии на +) -->
     <div id="add-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-header">
                 <button id="close-modal-btn" class="btn-text">Отмена</button>
-                <h3>Новая привычка</h3>
+                <h3 id="modal-title">Новая привычка</h3>
                 <button id="save-habit-btn" class="btn-text bold">Сохранить</button>
             </div>
             
             <div class="modal-body">
-                <div class="icon-preview" id="modal-icon-preview">💧</div>
+                <!-- Большая иконка выбранной привычки -->
+                <div class="icon-preview" id="modal-icon-preview">
+                    <span class="material-symbols-rounded">water_drop</span>
+                </div>
                 
                 <label>Название</label>
                 <input type="text" id="habit-name-input" placeholder="Например: Пить воду" autocomplete="off">
                 
                 <label>Иконка</label>
+                <!-- Выбор иконок -->
                 <div class="icon-picker" id="icon-picker">
-                    <button class="icon-option active" data-icon="💧">💧</button>
-                    <button class="icon-option" data-icon="🏃">🏃</button>
-                    <button class="icon-option" data-icon="📚">📚</button>
-                    <button class="icon-option" data-icon="🧘">🧘</button>
-                    <button class="icon-option" data-icon="🍎">🍎</button>
-                    <button class="icon-option" data-icon="💻">💻</button>
-                    <button class="icon-option" data-icon="🎨">🎨</button>
+                    <button class="icon-option active" data-icon="water_drop"><span class="material-symbols-rounded">water_drop</span></button>
+                    <button class="icon-option" data-icon="directions_run"><span class="material-symbols-rounded">directions_run</span></button>
+                    <button class="icon-option" data-icon="auto_stories"><span class="material-symbols-rounded">auto_stories</span></button>
+                    <button class="icon-option" data-icon="psychology"><span class="material-symbols-rounded">psychology</span></button>
+                    <button class="icon-option" data-icon="nutrition"><span class="material-symbols-rounded">nutrition</span></button>
+                    <button class="icon-option" data-icon="laptop_mac"><span class="material-symbols-rounded">laptop_mac</span></button>
+                    <button class="icon-option" data-icon="palette"><span class="material-symbols-rounded">palette</span></button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Модалка Действий (Редактировать/Удалить) -->
+    <!-- МОДАЛЬНОЕ ОКНО ДЕЙСТВИЙ (редактировать/удалить) -->
     <div id="action-modal" class="modal-overlay hidden">
         <div class="modal-content action-menu">
             <div class="action-header">
-                <button id="close-action-btn" class="close-x">✕</button>
+                <button id="close-action-btn" class="close-x"><span class="material-symbols-rounded">close</span></button>
                 <h3>Действия</h3>
             </div>
             <div class="action-list">
                 <button id="edit-habit-btn" class="action-item">
-                    <span>✏️</span> Редактировать
+                    <span class="material-symbols-rounded">edit</span> Редактировать
                 </button>
                 <button id="delete-habit-btn" class="action-item danger">
-                    <span>🗑️</span> Удалить
+                    <span class="material-symbols-rounded">delete</span> Удалить
                 </button>
-                <button id="cancel-action-btn" class="action-item cancel">
-                    Отмена
-                </button>
+                <button id="cancel-action-btn" class="action-item cancel">Отмена</button>
             </div>
         </div>
     </div>
 
+    <!-- Подключаем наш скрипт -->
     <script src="script.js"></script>
 </body>
 </html>
