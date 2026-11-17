@@ -237,9 +237,15 @@ function resetIconPicker() {
 function renderHabits() {
     container.innerHTML = ''; // Очищаем экран
 
-    // Если привычек нет, показываем текст
-    if (habits.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color:#8e8e93; grid-column: 1/-1;">Нет привычек. Нажмите «+», чтобы добавить!</p>';
+        if (habits.length === 0) {
+        container.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; margin-top: 40px;">
+                <p style="color:#8e8e93; font-size: 16px; margin-bottom: 15px;">У вас пока нет привычек</p>
+                <button onclick="document.getElementById('open-modal-btn').click()" style="background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);">
+                    + Создать первую
+                </button>
+            </div>
+        `;
         return;
     }
 
