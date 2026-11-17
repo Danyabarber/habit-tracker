@@ -144,6 +144,30 @@ function renderHabits() {
 
 // 1. Добавление привычки
 addBtn.addEventListener('click', () => {
+    addBtn.addEventListener('click', () => {
+    // Используем встроенный prompt, но с защитой от блокировки
+    const name = window.prompt('Введите название привычки:');
+    
+    // Если нажали "Отмена" или ввели пустоту
+    if (name === null) {
+        return; 
+    }
+    
+    if (name.trim() === '') {
+        alert('Название не может быть пустым!');
+        return;
+    }
+
+    const newHabit = {
+        id: crypto.randomUUID(),
+        name: name.trim(),
+        completedDates: []
+    };
+
+    habits.push(newHabit);
+    saveToLocalStorage();
+    renderHabits();
+});
     const name = prompt('Введите название привычки:');
     if (!name || name.trim() === '') {
         alert('Название не может быть пустым!');
