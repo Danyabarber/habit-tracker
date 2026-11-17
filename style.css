@@ -1,0 +1,149 @@
+/* Сброс стилей */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background-color: #f4f7f6;
+    color: #333;
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Шапка */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.header h1 {
+    font-size: 1.8rem;
+}
+
+/* Кнопка "Добавить" */
+.btn-primary {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #45a049;
+}
+
+/* Контейнер для карточек */
+.habits-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Карточка привычки */
+.habit-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+}
+
+.habit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.habit-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.habit-streak {
+    background: #fff3e0;
+    color: #e65100;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* Дни недели */
+.days-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.day-btn {
+    flex: 1;
+    padding: 10px 0;
+    border: 2px solid #ddd;
+    background: #fafafa;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.day-btn:hover {
+    border-color: #4CAF50;
+}
+
+.day-btn.completed {
+    background: #e8f5e9;
+    border-color: #4CAF50;
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+/* Кнопки действий (редактировать/удалить) */
+.habit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    transition: background 0.2s;
+}
+
+.btn-icon:hover {
+    background: #f0f0f0;
+}
+
+/* Адаптивность для телефонов */
+@media (max-width: 600px) {
+    .header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .days-row {
+        flex-wrap: wrap;
+    }
+    
+    .day-btn {
+        flex: 1 1 30%;
+    }
+}
