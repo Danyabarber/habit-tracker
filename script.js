@@ -1,235 +1,156 @@
-// ==========================================
-// 1. ПЕРЕМЕННЫЕ И ХРАНИЛИЩЕ
-// ==========================================
+// --- Состояние приложения ---
+let habits = JSON.parse(localStorage.getItem('habits_v2')) || [];
+const todayStr = new Date().toISOString().split('T')[0];
 
-// Получаем ссылки на элементы страницы
-const addBtn = document.getElementById('add-btn');
+// --- DOM Элементы ---
 const container = document.getElementById('habits-container');
+const modal = document.getElementById('add-modal');
+const openModalBtn = document.getElementById('open-modal-btn');
+const closeModalBtn = document.getElementById('close-modal-btn');
+const saveHabitBtn = document.getElementById('save-habit-btn');
+const nameInput = document.getElementById('habit-name-input');
+const iconPicker = document.getElementById('icon-picker');
+const iconPreview = document.getElementById('modal-icon-preview');
+const progressText = document.getElementById('daily-progress-text');
+const progressRing = document.getElementById('progress-ring');
 
-// Ключ, под которым данные лежат в localStorage
-const STORAGE_KEY = 'habits_data';
+// Текущая выбранная иконка
+let selectedIcon = '💧';
 
-// Загружаем привычки из памяти браузера (или пустой массив, если там ничего нет)
-let habits = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-
-// Функция сохранения в память
-function saveToLocalStorage() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(habits));
-}
-
-// ==========================================
-// 2. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-// ==========================================
-
-// Функция для получения сегодняшней даты в формате "2026-11-17"
-function getTodayDate() {
-    return new Date().toISOString().split('T')[0];
-}
-
-// Функция для получения дат текущей недели (Пн-Вс)
-function getCurrentWeekDates() {
-    const today = new Date();
-    const dayOfWeek = today.getDay(); // 0 - Вс, 1 - Пн, ...
+// --- Инициализация ---
+function init() {
+    // Установка текущей даты в шапку
+    const options = { day: 'numeric', month: 'long' };
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString('ru-RU', options);
     
-    // Вычисляем, сколько дней отступить до понедельника
-    const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-    const monday = new Date(today);
-    monday.setDate(today.getDate() + diffToMonday);
+    renderHabits();
+    updateProgress();
 
-    const weekDates = [];
-    for (let i = 0; i < 7; i++) {
-        const date = new Date(monday);
-        date.setDate(monday.getDate() + i);
-        weekDates.push(date.toISOString().split('T')[0]);
-    }
-    return weekDates;
-}
+    // Слушатели модального окна
+    openModalBtn.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+        nameInput.focus();
+    });
 
-// Считаем серию (сколько дней подряд отмечено на этой неделе)
-function calculateStreak(completedDates) {
-    if (completedDates.length === 0) return 0;
-    
-    const weekDates = getCurrentWeekDates();
-    let maxStreak = 0;
-    let currentStreak = 0;
+    closeModalBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        nameInput.value = '';
+        resetIconPicker();
+    });
 
-    // Идем по дням недели (с Пн по Вс)
-    weekDates.forEach(date => {
-        if (completedDates.includes(date)) {
-            currentStreak++;
-            if (currentStreak > maxStreak) {
-                maxStreak = currentStreak;
-            }
-        } else {
-            // Если попался пропуск, сбрасываем текущую серию
-            currentStreak = 0; 
+    // Выбор иконки
+    iconPicker.addEventListener('click', (e) => {
+        if (e.target.classList.contains('icon-option')) {
+            document.querySelectorAll('.icon-option').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            selectedIcon = e.target.dataset.icon;
+            iconPreview.textContent = selectedIcon;
         }
     });
 
-    return maxStreak;
+    // Сохранение новой привычки
+    saveHabitBtn.addEventListener('click', () => {
+        const name = nameInput.value.trim();
+        if (!name) return alert('Введите название');
+
+        const newHabit = {
+            id: Date.now().toString(),
+            name: name,
+            icon: selectedIcon,
+            completedDates: [] // Массив дат, когда выполнено
+        };
+
+        habits.push(newHabit);
+        saveData();
+        renderHabits();
+        updateProgress();
+        
+        modal.classList.add('hidden');
+        nameInput.value = '';
+        resetIconPicker();
+    });
 }
 
-// ==========================================
-// 3. ОТРИСОВКА ИНТЕРФЕЙСА
-// ==========================================
+function resetIconPicker() {
+    selectedIcon = '💧';
+    iconPreview.textContent = selectedIcon;
+    document.querySelectorAll('.icon-option').forEach(btn => btn.classList.remove('active'));
+    document.querySelector('.icon-option[data-icon="💧"]').classList.add('active');
+}
 
+// --- Сохранение ---
+function saveData() {
+    localStorage.setItem('habits_v2', JSON.stringify(habits));
+}
+
+// --- Рендер ---
 function renderHabits() {
-    // Очищаем контейнер
     container.innerHTML = '';
 
-    // Если привычек нет, показываем сообщение
     if (habits.length === 0) {
-        container.innerHTML = `
-            <div style="text-align: center; color: #666; padding: 40px 20px;">
-                <h2>У вас пока нет привычек 😴</h2>
-                <p>Нажмите "+ Добавить", чтобы создать первую!</p>
-            </div>
-        `;
+        container.innerHTML = `<p style="text-align:center; color:#8e8e93; margin-top:20px;">Нет привычек. Добавьте первую!</p>`;
         return;
     }
 
-    const weekDates = getCurrentWeekDates();
-    const dayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-
-    // Проходимся по каждой привычке
     habits.forEach(habit => {
-        const streak = calculateStreak(habit.completedDates);
+        const isCompletedToday = habit.completedDates.includes(todayStr);
+        
         const card = document.createElement('div');
-        card.className = 'habit-card';
-
-        // Генерируем кнопки для дней недели
-        let daysHTML = '';
-                       weekDates.forEach((date, index) => {
-            const isCompleted = habit.completedDates.includes(date);
-            const completedClass = isCompleted ? 'completed' : '';
-            
-            daysHTML += `
-                <button class="day-btn ${completedClass}" 
-                        data-habit-id="${habit.id}" 
-                        data-date="${date}"
-                        aria-label="${dayNames[index]}">
-                    ${dayNames[index]}
-                </button>
-            `;
-        });
-
-        // Вставляем HTML карточки (используем textContent для названия, чтобы защититься от XSS)
+        card.className = `habit-card ${isCompletedToday ? 'completed' : ''}`;
+        
         card.innerHTML = `
-            <div class="habit-header">
-                <h2 class="habit-name"></h2>
-                <span class="habit-streak">🔥 серия: ${streak} дн.</span>
+            <div class="habit-icon">${habit.icon}</div>
+            <div class="habit-info">
+                <div class="habit-name"></div>
+                <div class="habit-goal">${isCompletedToday ? 'Выполнено' : 'Нажмите, чтобы выполнить'}</div>
             </div>
-            <div class="days-row">${daysHTML}</div>
-            <div class="habit-actions">
-                <button class="btn-icon btn-edit" data-habit-id="${habit.id}" aria-label="Редактировать">✏️</button>
-                <button class="btn-icon btn-delete" data-habit-id="${habit.id}" aria-label="Удалить">🗑️</button>
-            </div>
+            <div class="check-circle">✓</div>
         `;
-
-        // Безопасно вставляем название (защита от XSS)
+        
+        // Защита от XSS
         card.querySelector('.habit-name').textContent = habit.name;
 
-        // Добавляем карточку на страницу
+        // Обработчик клика по карточке (отметить/снять)
+        card.addEventListener('click', () => toggleHabit(habit.id));
+        
         container.appendChild(card);
     });
 }
 
-// ==========================================
-// 4. ОБРАБОТЧИКИ СОБЫТИЙ
-// ==========================================
+// --- Логика ---
+function toggleHabit(id) {
+    const habit = habits.find(h => h.id === id);
+    if (!habit) return;
 
-// 1. Добавление привычки
-addBtn.addEventListener('click', () => {
-    addBtn.addEventListener('click', () => {
-    // Используем встроенный prompt, но с защитой от блокировки
-    const name = window.prompt('Введите название привычки:');
-    
-    // Если нажали "Отмена" или ввели пустоту
-    if (name === null) {
-        return; 
+    if (habit.completedDates.includes(todayStr)) {
+        // Удаляем сегодняшнюю дату
+        habit.completedDates = habit.completedDates.filter(d => d !== todayStr);
+    } else {
+        // Добавляем сегодняшнюю дату
+        habit.completedDates.push(todayStr);
     }
-    
-    if (name.trim() === '') {
-        alert('Название не может быть пустым!');
+
+    saveData();
+    renderHabits();
+    updateProgress();
+}
+
+// --- Прогресс ---
+function updateProgress() {
+    const total = habits.length;
+    if (total === 0) {
+        progressText.textContent = `0/0`;
+        progressRing.style.strokeDasharray = `0, 100`;
         return;
     }
 
-    const newHabit = {
-        id: crypto.randomUUID(),
-        name: name.trim(),
-        completedDates: []
-    };
+    const completedToday = habits.filter(h => h.completedDates.includes(todayStr)).length;
+    progressText.textContent = `${completedToday}/${total}`;
 
-    habits.push(newHabit);
-    saveToLocalStorage();
-    renderHabits();
-});
-    const name = prompt('Введите название привычки:');
-    if (!name || name.trim() === '') {
-        alert('Название не может быть пустым!');
-        return;
-    }
+    // Расчет процента для SVG круга (длина окружности 100)
+    const percentage = (completedToday / total) * 100;
+    progressRing.style.strokeDasharray = `${percentage}, 100`;
+}
 
-    const newHabit = {
-        id: crypto.randomUUID(), // Генерируем уникальный ID
-        name: name.trim(),
-        completedDates: [] // Изначально ничего не выполнено
-    };
-
-    habits.push(newHabit);
-    saveToLocalStorage();
-    renderHabits();
-});
-
-// 2. Делегирование событий (клики по кнопкам внутри карточек)
-container.addEventListener('click', (e) => {
-    // Если кликнули по кнопке дня
-    if (e.target.classList.contains('day-btn')) {
-        const habitId = e.target.dataset.habitId;
-        const date = e.target.dataset.date;
-        
-        const habit = habits.find(h => h.id === habitId);
-        if (!habit) return;
-
-        // Если дата уже есть - убираем, если нет - добавляем
-        if (habit.completedDates.includes(date)) {
-            habit.completedDates = habit.completedDates.filter(d => d !== date);
-        } else {
-            habit.completedDates.push(date);
-        }
-
-        saveToLocalStorage();
-        renderHabits();
-    }
-
-    // Если кликнули по кнопке "Удалить"
-    if (e.target.closest('.btn-delete')) {
-        const habitId = e.target.closest('.btn-delete').dataset.habitId;
-        if (confirm('Удалить эту привычку?')) {
-            habits = habits.filter(h => h.id !== habitId);
-            saveToLocalStorage();
-            renderHabits();
-        }
-    }
-
-    // Если кликнули по кнопке "Редактировать"
-    if (e.target.closest('.btn-edit')) {
-        const habitId = e.target.closest('.btn-edit').dataset.habitId;
-        const habit = habits.find(h => h.id === habitId);
-        if (!habit) return;
-
-        const newName = prompt('Новое название привычки:', habit.name);
-        if (newName && newName.trim() !== '') {
-            habit.name = newName.trim();
-            saveToLocalStorage();
-            renderHabits();
-        }
-    }
-});
-
-// ==========================================
-// 5. ЗАПУСК ПРИЛОЖЕНИЯ
-// ==========================================
-
-// При загрузке страницы сразу отрисовываем привычки
-renderHabits();
+// Запуск
+init();

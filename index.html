@@ -2,19 +2,88 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Трекер привычек</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="header">
-        <h1>🌟 Трекер привычек</h1>
-        <button id="add-btn" class="btn-primary">+ Добавить</button>
-    </header>
+    <div class="app-container">
+        <!-- Шапка -->
+        <header class="top-bar">
+            <div class="date-display">Сегодня, <span id="current-date"></span></div>
+            <div class="avatar">Д</div>
+        </header>
 
-    <main id="habits-container" class="habits-container">
-        <!-- Сюда JavaScript будет вставлять карточки привычек -->
-    </main>
+        <h1 class="page-title">Привычки</h1>
+
+        <!-- Карточка общего прогресса -->
+        <div class="progress-card">
+            <div class="progress-info">
+                <h2 id="daily-progress-text">0/0</h2>
+                <p>выполнено сегодня</p>
+            </div>
+            <div class="circular-progress">
+                <svg viewBox="0 0 36 36">
+                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path class="circle-fill" id="progress-ring" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- Список привычек -->
+        <main id="habits-container" class="habits-list">
+            <!-- Сюда JS рендерит карточки -->
+        </main>
+
+        <!-- Нижнее меню -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active">
+                <span class="icon">🏠</span>
+                <span>Главная</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="icon">📊</span>
+                <span>Статистика</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="icon">📅</span>
+                <span>Календарь</span>
+            </a>
+            <div class="nav-item add-btn-wrapper">
+                <button id="open-modal-btn" class="fab">+</button>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Модальное окно добавления -->
+    <div id="add-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button id="close-modal-btn" class="btn-text">Отмена</button>
+                <h3>Новая привычка</h3>
+                <button id="save-habit-btn" class="btn-text bold">Сохранить</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="icon-preview" id="modal-icon-preview">💧</div>
+                
+                <label>Название</label>
+                <input type="text" id="habit-name-input" placeholder="Например: Пить воду" autocomplete="off">
+                
+                <label>Иконка</label>
+                <div class="icon-picker" id="icon-picker">
+                    <button class="icon-option active" data-icon="💧">💧</button>
+                    <button class="icon-option" data-icon="🏃">🏃</button>
+                    <button class="icon-option" data-icon="📚">📚</button>
+                    <button class="icon-option" data-icon="🧘">🧘</button>
+                    <button class="icon-option" data-icon="🍎">🍎</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

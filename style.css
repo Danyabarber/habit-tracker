@@ -1,155 +1,359 @@
-/* Сброс стилей */
+:root {
+    --bg-color: #f7f7f9;
+    --card-bg: #ffffff;
+    --text-main: #1c1c1e;
+    --text-muted: #8e8e93;
+    --primary: #34c759;
+    --primary-light: #e8f8ed;
+    --border: #e5e5ea;
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', -apple-system, sans-serif;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    background-color: #f4f7f6;
-    color: #333;
-    padding: 20px;
-    max-width: 900px;
-    margin: 0 auto;
+    background-color: #e0e0e0; /* Фон за пределами мобильного экрана */
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.app-container {
+    background-color: var(--bg-color);
+    width: 100%;
+    max-width: 420px; /* Ширина мобильного экрана */
+    min-height: 100vh;
+    position: relative;
+    padding-bottom: 80px; /* Место для нижнего меню */
+    overflow-x: hidden;
 }
 
 /* Шапка */
-.header {
+.top-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #e0e0e0;
+    padding: 20px 24px;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
 }
 
-.header h1 {
-    font-size: 1.8rem;
-}
-
-/* Кнопка "Добавить" */
-.btn-primary {
-    background-color: #4CAF50;
+.avatar {
+    width: 32px;
+    height: 32px;
+    background: var(--text-main);
     color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.btn-primary:hover {
-    background-color: #45a049;
-}
-
-/* Контейнер для карточек */
-.habits-container {
+    border-radius: 50%;
     display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-/* Карточка привычки */
-.habit-card {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    border: 1px solid #eee;
-}
-
-.habit-header {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
-}
-
-.habit-name {
-    font-size: 1.2rem;
+    justify-content: center;
     font-weight: 600;
 }
 
-.habit-streak {
-    background: #fff3e0;
-    color: #e65100;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: bold;
+.page-title {
+    padding: 0 24px;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 24px;
 }
 
-/* Дни недели */
-.days-row {
+/* Карточка прогресса */
+.progress-card {
+    background: var(--card-bg);
+    margin: 0 24px 24px 24px;
+    padding: 20px 24px;
+    border-radius: 24px;
     display: flex;
-    gap: 8px;
-    margin-bottom: 15px;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
 }
 
-.day-btn {
-    flex: 1;
-    padding: 10px 0;
-    border: 2px solid #ddd;
-    background: #fafafa;
-    border-radius: 8px;
+.progress-info h2 {
+    font-size: 28px;
+    color: var(--text-main);
+    margin-bottom: 4px;
+}
+
+.progress-info p {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+/* Круговой прогресс */
+.circular-progress {
+    width: 60px;
+    height: 60px;
+}
+
+.circular-progress svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.circle-bg {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 3;
+}
+
+.circle-fill {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 3;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.5s ease;
+}
+
+/* Список привычек */
+.habits-list {
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.habit-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
     cursor: pointer;
-    font-size: 0.9rem;
+    transition: transform 0.1s;
+}
+
+.habit-card:active {
+    transform: scale(0.98);
+}
+
+.habit-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: #f2f2f7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.habit-info {
+    flex: 1;
+}
+
+.habit-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 2px;
+}
+
+.habit-goal {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.check-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: transparent;
     transition: all 0.2s;
 }
 
-.day-btn:hover {
-    border-color: #4CAF50;
+.habit-card.completed .check-circle {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
 }
 
-.day-btn.completed {
-    background: #e8f5e9;
-    border-color: #4CAF50;
-    color: #2e7d32;
-    font-weight: bold;
-}
-
-/* Кнопки действий (редактировать/удалить) */
-.habit-actions {
+/* Нижнее меню */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    max-width: 420px;
+    background: var(--card-bg);
     display: flex;
-    justify-content: flex-end;
-    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    border-top: 1px solid var(--border);
+    z-index: 10;
 }
 
-.btn-icon {
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 500;
+    gap: 4px;
+}
+
+.nav-item.active {
+    color: var(--primary);
+}
+
+.nav-item .icon {
+    font-size: 20px;
+}
+
+.add-btn-wrapper {
+    position: relative;
+    top: -20px; /* Приподнимаем кнопку */
+}
+
+.fab {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(52, 199, 89, 0.4);
+    cursor: pointer;
+}
+
+/* Модальное окно */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Появление снизу */
+    z-index: 100;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+.modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-content {
+    background: var(--bg-color);
+    width: 100%;
+    max-width: 420px;
+    border-radius: 24px 24px 0 0;
+    padding: 24px;
+    transform: translateY(0);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-overlay.hidden .modal-content {
+    transform: translateY(100%);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.modal-header h3 {
+    font-size: 17px;
+    color: var(--text-main);
+}
+
+.btn-text {
     background: none;
     border: none;
-    font-size: 1.2rem;
+    font-size: 16px;
+    color: var(--primary);
     cursor: pointer;
-    padding: 5px;
-    border-radius: 5px;
-    transition: background 0.2s;
 }
 
-.btn-icon:hover {
-    background: #f0f0f0;
+.btn-text.bold {
+    font-weight: 600;
 }
 
-/* Адаптивность для телефонов */
-@media (max-width: 600px) {
-    .header {
-        flex-direction: column;
-        gap: 15px;
-        align-items: flex-start;
-    }
-    
-    .days-row {
-        flex-wrap: wrap;
-    }
-    
-    .day-btn {
-        flex: 1 1 30%;
-    }
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
-.day-btn.disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    background: #f0f0f0;
-    border-color: #ccc;
+
+.icon-preview {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    background: var(--primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    margin: 0 auto;
+}
+
+.modal-body label {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: -8px;
+}
+
+.modal-body input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    font-size: 16px;
+    background: var(--card-bg);
+    outline: none;
+}
+
+.modal-body input:focus {
+    border-color: var(--primary);
+}
+
+.icon-picker {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+.icon-option {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: var(--card-bg);
+    border: 2px solid transparent;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-option.active {
+    border-color: var(--primary);
+    background: var(--primary-light);
 }
