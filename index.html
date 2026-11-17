@@ -15,18 +15,40 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Главный контейнер приложения (выглядит как экран телефона) -->
+    <!-- Главный контейнер приложения -->
     <div class="app-container">
         
+        <!-- МЕНЮ НАВИГАЦИИ (теперь оно в самом начале, поэтому встанет СЛЕВА на ноутбуке) -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active" data-target="screen-home">
+                <span class="material-symbols-rounded icon">home</span><span>Главная</span>
+            </a>
+            <a href="#" class="nav-item" data-target="screen-stats">
+                <span class="material-symbols-rounded icon">bar_chart</span><span>Статистика</span>
+            </a>
+            <a href="#" class="nav-item" data-target="screen-calendar">
+                <span class="material-symbols-rounded icon">calendar_month</span><span>Календарь</span>
+            </a>
+            <a href="#" class="nav-item" data-target="screen-history">
+                <span class="material-symbols-rounded icon">history</span><span>История</span>
+            </a>
+            <!-- Кнопка плюс для добавления привычки -->
+            <div class="nav-item add-btn-wrapper">
+                <button id="open-modal-btn" class="fab">
+                    <span class="material-symbols-rounded">add</span>
+                </button>
+            </div>
+        </nav>
+
         <!-- ================= ЭКРАН 1: ГЛАВНАЯ ================= -->
         <section id="screen-home" class="screen active">
             <header class="top-bar">
-                <!-- ТУТ ИЗМЕНЕНИЕ: Добавили id="open-calendar-btn", чтобы по клику открывался календарь -->
+                <!-- Кликабельная дата для перехода в календарь -->
                 <div class="date-display" id="open-calendar-btn">
                     Сегодня, <span id="current-date"></span>
                 </div>
                 <div class="header-actions">
-                    <!-- Кнопка переключения темы (луна/солнце) -->
+                    <!-- Кнопка переключения темы -->
                     <button id="theme-toggle" class="theme-btn">
                         <span class="material-symbols-rounded">dark_mode</span>
                     </button>
@@ -37,13 +59,12 @@
 
             <h1 class="page-title">Привычки</h1>
 
-            <!-- Карточка с общим прогрессом за сегодня -->
+            <!-- Карточка с общим прогрессом -->
             <div class="progress-card">
                 <div class="progress-info">
                     <h2 id="daily-progress-text">0/0</h2>
                     <p>выполнено сегодня</p>
                 </div>
-                <!-- Кружок прогресса (сделан через SVG) -->
                 <div class="circular-progress">
                     <svg viewBox="0 0 36 36">
                         <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
@@ -117,7 +138,6 @@
                 <div class="calendar-weekdays">
                     <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
                 </div>
-                <!-- Сюда JS будет вставлять числа месяца -->
                 <div class="calendar-days" id="calendar-days"></div>
             </div>
             <p class="calendar-hint">Зеленым отмечены дни с выполненными привычками.</p>
@@ -132,7 +152,6 @@
 
             <h1 class="page-title">История</h1>
 
-            <!-- Сюда JS будет вставлять список выполненных дел по датам -->
             <div id="history-container" class="history-list"></div>
         </section>
 
@@ -164,30 +183,9 @@
             </div>
         </section>
 
-        <!-- МЕНЮ НАВИГАЦИИ (внизу экрана) -->
-        <nav class="bottom-nav">
-            <a href="#" class="nav-item active" data-target="screen-home">
-                <span class="material-symbols-rounded icon">home</span><span>Главная</span>
-            </a>
-            <a href="#" class="nav-item" data-target="screen-stats">
-                <span class="material-symbols-rounded icon">bar_chart</span><span>Статистика</span>
-            </a>
-            <a href="#" class="nav-item" data-target="screen-calendar">
-                <span class="material-symbols-rounded icon">calendar_month</span><span>Календарь</span>
-            </a>
-            <a href="#" class="nav-item" data-target="screen-history">
-                <span class="material-symbols-rounded icon">history</span><span>История</span>
-            </a>
-            <!-- Кнопка плюс для добавления привычки -->
-            <div class="nav-item add-btn-wrapper">
-                <button id="open-modal-btn" class="fab">
-                    <span class="material-symbols-rounded">add</span>
-                </button>
-            </div>
-        </nav>
-    </div>
+    </div> <!-- Закрываем app-container -->
 
-    <!-- МОДАЛЬНОЕ ОКНО ДОБАВЛЕНИЯ (появляется при нажатии на +) -->
+    <!-- МОДАЛЬНОЕ ОКНО ДОБАВЛЕНИЯ -->
     <div id="add-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-header">
@@ -197,7 +195,6 @@
             </div>
             
             <div class="modal-body">
-                <!-- Большая иконка выбранной привычки -->
                 <div class="icon-preview" id="modal-icon-preview">
                     <span class="material-symbols-rounded">water_drop</span>
                 </div>
@@ -206,7 +203,6 @@
                 <input type="text" id="habit-name-input" placeholder="Например: Пить воду" autocomplete="off">
                 
                 <label>Иконка</label>
-                <!-- Выбор иконок -->
                 <div class="icon-picker" id="icon-picker">
                     <button class="icon-option active" data-icon="water_drop"><span class="material-symbols-rounded">water_drop</span></button>
                     <button class="icon-option" data-icon="directions_run"><span class="material-symbols-rounded">directions_run</span></button>
@@ -220,7 +216,7 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ДЕЙСТВИЙ (редактировать/удалить) -->
+    <!-- МОДАЛЬНОЕ ОКНО ДЕЙСТВИЙ -->
     <div id="action-modal" class="modal-overlay hidden">
         <div class="modal-content action-menu">
             <div class="action-header">
