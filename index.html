@@ -11,40 +11,88 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Шапка -->
-        <header class="top-bar">
-            <div class="date-display">Сегодня, <span id="current-date"></span></div>
-            <div class="avatar">Д</div>
-        </header>
+        
+        <!-- ЭКРАН 1: ГЛАВНАЯ -->
+        <section id="screen-home" class="screen active">
+            <header class="top-bar">
+                <div class="date-display">Сегодня, <span id="current-date"></span></div>
+                <div class="avatar">Д</div>
+            </header>
 
-        <h1 class="page-title">Привычки</h1>
+            <h1 class="page-title">Привычки</h1>
 
-        <!-- Карточка общего прогресса -->
-        <div class="progress-card">
-            <div class="progress-info">
-                <h2 id="daily-progress-text">0/0</h2>
-                <p>выполнено сегодня</p>
+            <div class="progress-card">
+                <div class="progress-info">
+                    <h2 id="daily-progress-text">0/0</h2>
+                    <p>выполнено сегодня</p>
+                </div>
+                <div class="circular-progress">
+                    <svg viewBox="0 0 36 36">
+                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="circle-fill" id="progress-ring" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                </div>
             </div>
-            <div class="circular-progress">
-                <svg viewBox="0 0 36 36">
-                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <path class="circle-fill" id="progress-ring" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                </svg>
-            </div>
-        </div>
 
-        <!-- Список привычек -->
-        <main id="habits-container" class="habits-list">
-            <!-- Сюда JS рендерит карточки -->
-        </main>
+            <main id="habits-container" class="habits-list">
+                <!-- Сюда JS рендерит карточки -->
+            </main>
+        </section>
+
+        <!-- ЭКРАН 2: СТАТИСТИКА -->
+        <section id="screen-stats" class="screen">
+            <header class="top-bar">
+                <div class="date-display">Ваш прогресс</div>
+                <div class="avatar">Д</div>
+            </header>
+
+            <h1 class="page-title">Статистика</h1>
+
+            <div class="stats-card">
+                <div class="stats-circle-wrapper">
+                    <div class="circular-progress large">
+                        <svg viewBox="0 0 36 36">
+                            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="circle-fill green" id="stats-ring" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        </svg>
+                    </div>
+                    <div class="stats-center-text">
+                        <h2 id="stats-percentage">0%</h2>
+                        <p>успешность</p>
+                    </div>
+                </div>
+                
+                <div class="stats-legend">
+                    <div class="legend-item">
+                        <span class="dot green"></span>
+                        <div>
+                            <h4 id="stats-completed">0</h4>
+                            <p>Выполнено</p>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <span class="dot gray"></span>
+                        <div>
+                            <h4 id="stats-skipped">0</h4>
+                            <p>Пропущено</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="section-title">Лучшие привычки</h3>
+            <div id="best-habits-container" class="best-habits-list">
+                <!-- Сюда JS рендерит лучшие привычки -->
+            </div>
+        </section>
 
         <!-- Нижнее меню -->
         <nav class="bottom-nav">
-            <a href="#" class="nav-item active">
+            <a href="#" class="nav-item active" data-target="screen-home">
                 <span class="icon">🏠</span>
                 <span>Главная</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="#" class="nav-item" data-target="screen-stats">
                 <span class="icon">📊</span>
                 <span>Статистика</span>
             </a>
@@ -58,7 +106,7 @@
         </nav>
     </div>
 
-    <!-- Модальное окно добавления -->
+    <!-- Модалка добавления привычки -->
     <div id="add-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-header">
@@ -80,7 +128,30 @@
                     <button class="icon-option" data-icon="📚">📚</button>
                     <button class="icon-option" data-icon="🧘">🧘</button>
                     <button class="icon-option" data-icon="🍎">🍎</button>
+                    <button class="icon-option" data-icon="💻">💻</button>
+                    <button class="icon-option" data-icon="🎨">🎨</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка Действий (Редактировать/Удалить) -->
+    <div id="action-modal" class="modal-overlay hidden">
+        <div class="modal-content action-menu">
+            <div class="action-header">
+                <button id="close-action-btn" class="close-x">✕</button>
+                <h3>Действия</h3>
+            </div>
+            <div class="action-list">
+                <button id="edit-habit-btn" class="action-item">
+                    <span>✏️</span> Редактировать
+                </button>
+                <button id="delete-habit-btn" class="action-item danger">
+                    <span>🗑️</span> Удалить
+                </button>
+                <button id="cancel-action-btn" class="action-item cancel">
+                    Отмена
+                </button>
             </div>
         </div>
     </div>

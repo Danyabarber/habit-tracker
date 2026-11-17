@@ -357,3 +357,297 @@ body {
     border-color: var(--primary);
     background: var(--primary-light);
 }
+/* --- НОВЫЕ СТИЛИ ДЛЯ ЭКРАНОВ И СТАТИСТИКИ --- */
+
+/* Управление экранами */
+.screen {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+.screen.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Карточка статистики */
+.stats-card {
+    background: var(--card-bg);
+    margin: 0 24px 24px 24px;
+    padding: 30px 24px;
+    border-radius: 24px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+.stats-circle-wrapper {
+    position: relative;
+    width: 140px;
+    height: 140px;
+}
+
+.circular-progress.large {
+    width: 100%;
+    height: 100%;
+}
+
+.circular-progress.large .circle-bg {
+    stroke: #f2f2f7;
+    stroke-width: 2.5;
+}
+
+.circular-progress.large .circle-fill {
+    stroke: #2bd486;
+    stroke-width: 2.5;
+    transition: stroke-dasharray 1s ease;
+}
+
+.stats-center-text {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.stats-center-text h2 {
+    font-size: 32px;
+    color: var(--text-main);
+}
+
+.stats-center-text p {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.stats-legend {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+.dot.green { background: #2bd486; }
+.dot.gray { background: #e5e5ea; }
+
+.legend-item h4 {
+    font-size: 18px;
+    color: var(--text-main);
+}
+.legend-item p {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* Лучшие привычки */
+.section-title {
+    font-size: 18px;
+    color: var(--text-main);
+    margin: 0 24px 16px 24px;
+}
+
+.best-habits-list {
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.best-habit-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card-bg);
+    padding: 12px 16px;
+    border-radius: 16px;
+}
+.best-habit-item .icon { font-size: 24px; }
+.best-habit-item .info { flex: 1; }
+.best-habit-item h4 { font-size: 15px; color: var(--text-main); }
+.best-habit-item p { font-size: 12px; color: var(--text-muted); }
+.best-habit-item .percent { font-weight: 700; color: #2bd486; font-size: 14px; }
+
+/* Модалка действий (выезжает снизу как в iOS) */
+.action-menu {
+    padding: 16px;
+}
+
+.action-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    position: relative;
+    justify-content: center;
+}
+.action-header h3 {
+    font-size: 15px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+.close-x {
+    position: absolute;
+    left: 0;
+    background: #e5e5ea;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.action-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.action-item {
+    background: var(--card-bg);
+    border: none;
+    padding: 16px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-main);
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.action-item.danger { color: #ff3b30; }
+.action-item.cancel { justify-content: center; color: var(--text-muted); }
+/* =========================================
+   ДЕСКТОПНАЯ ВЕРСИЯ (Ноутбуки и ПК)
+   ========================================= */
+@media (min-width: 768px) {
+    /* Красивый фон для рабочего стола */
+    body {
+        background-color: #e5e9ec; 
+        align-items: center; 
+    }
+
+    /* Приложение становится похожим на окно программы */
+    .app-container {
+        max-width: 1000px;
+        height: 85vh; /* Высота окна */
+        background: var(--bg-color);
+        border-radius: 24px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: row; /* Меню слева, контент справа */
+        padding-bottom: 0;
+        overflow: hidden;
+    }
+
+    /* Нижнее меню превращается в боковую панель */
+    .bottom-nav {
+        position: static; /* Отключаем фиксацию внизу */
+        width: 100px;
+        height: 100%;
+        flex-direction: column;
+        justify-content: flex-start;
+        padding: 30px 10px;
+        border-top: none;
+        border-right: 1px solid var(--border);
+        gap: 20px;
+    }
+
+    .nav-item {
+        width: 100%;
+        padding: 12px 0;
+        border-radius: 12px;
+        transition: background 0.2s;
+    }
+
+    .nav-item:hover {
+        background: var(--border);
+    }
+
+    /* Кнопку "+" прижимаем вниз сайдбара */
+    .add-btn-wrapper {
+        margin-top: auto; 
+        top: 0;
+    }
+
+    /* Контентная часть занимает оставшееся место */
+    .screen {
+        flex: 1;
+        height: 100%;
+        overflow-y: auto; /* Включаем скролл внутри экрана */
+        padding: 40px;
+    }
+
+    /* Убираем отступы, которые были для мобилок */
+    .page-title {
+        padding: 0;
+        margin-bottom: 30px;
+    }
+
+    .progress-card {
+        margin: 0 0 30px 0;
+    }
+
+    /* Карточки привычек выстраиваются в сетку (2-3 колонки) */
+    .habits-list, .best-habits-list {
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+    }
+
+    /* Карточка статистики на десктопе становится шире */
+    .stats-card {
+        margin: 0 0 30px 0;
+        flex-direction: row;
+        justify-content: space-around;
+    }
+
+    .stats-legend {
+        flex-direction: column;
+        gap: 20px;
+        width: auto;
+        border-top: none;
+        border-left: 1px solid var(--border);
+        padding-top: 0;
+        padding-left: 40px;
+    }
+
+    /* Модальные окна по центру экрана */
+    .modal-overlay {
+        align-items: center; /* Центрируем по вертикали */
+    }
+    
+    .modal-content {
+        border-radius: 24px;
+        max-width: 450px;
+        transform: scale(1);
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .modal-overlay.hidden .modal-content {
+        transform: scale(0.9); /* Анимация уменьшения */
+    }
+}
