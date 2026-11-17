@@ -147,3 +147,9 @@ body {
         flex: 1 1 30%;
     }
 }
+.day-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: #f0f0f0;
+    border-color: #ccc;
+}

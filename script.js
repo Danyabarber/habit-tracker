@@ -45,33 +45,28 @@ function getCurrentWeekDates() {
     return weekDates;
 }
 
-// Считаем серию (сколько дней подряд выполнялась привычка)
+// Считаем серию (сколько дней подряд отмечено на этой неделе)
 function calculateStreak(completedDates) {
     if (completedDates.length === 0) return 0;
     
-    // Сортируем даты от новых к старым
-    const sorted = [...completedDates].sort((a, b) => new Date(b) - new Date(a));
-    let streak = 0;
-    let currentDate = new Date();
-    
-    // Проверяем, есть ли сегодняшняя дата
-    const todayStr = getTodayDate();
-    if (!sorted.includes(todayStr)) {
-        // Если сегодня не выполнено, начинаем проверку со вчерашнего дня
-        currentDate.setDate(currentDate.getDate() - 1);
-    }
+    const weekDates = getCurrentWeekDates();
+    let maxStreak = 0;
+    let currentStreak = 0;
 
-    // Идем назад по дням, пока есть совпадения
-    while (true) {
-        const dateStr = currentDate.toISOString().split('T')[0];
-        if (sorted.includes(dateStr)) {
-            streak++;
-            currentDate.setDate(currentDate.getDate() - 1);
+    // Идем по дням недели (с Пн по Вс)
+    weekDates.forEach(date => {
+        if (completedDates.includes(date)) {
+            currentStreak++;
+            if (currentStreak > maxStreak) {
+                maxStreak = currentStreak;
+            }
         } else {
-            break;
+            // Если попался пропуск, сбрасываем текущую серию
+            currentStreak = 0; 
         }
-    }
-    return streak;
+    });
+
+    return maxStreak;
 }
 
 // ==========================================
@@ -104,9 +99,10 @@ function renderHabits() {
 
         // Генерируем кнопки для дней недели
         let daysHTML = '';
-        weekDates.forEach((date, index) => {
+                       weekDates.forEach((date, index) => {
             const isCompleted = habit.completedDates.includes(date);
             const completedClass = isCompleted ? 'completed' : '';
+            
             daysHTML += `
                 <button class="day-btn ${completedClass}" 
                         data-habit-id="${habit.id}" 
