@@ -1,38 +1,45 @@
-<!DOCTYPE html>
-<html lang="ru">
+<!DOCTYPE html> <!-- говорю браузеру что это HTML5 -->
+<html lang="ru"> <!-- язык сайта русский, чтобы переводчик понимал -->
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Трекер привычек</title>
+    <meta charset="UTF-8"> <!-- это чтобы русские буквы не были кракозябрами -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- чтобы на телефоне сайт был нормального размера -->
+    <title>Трекер привычек</title> <!-- это текст на вкладке браузера -->
     
-    <!-- Подключаем красивый шрифт Inter -->
+    <!-- тут я подключаю шрифт Inter, мне он нравится, он красивый -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Подключаем иконки от Google (Material Symbols) -->
+    <!-- а тут иконки, я взял их у гугла, они бесплатные -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
     
-    <!-- Подключаем наши стили -->
+    <!-- это мой файл со стилями, я его отдельно сделал чтобы тут не мешался -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Главный контейнер приложения -->
+
+    <!-- вот тут начинается всё приложение -->
+    <!-- я сделал обёртку, чтобы на компьютере оно было узким, как телефон -->
     <div class="app-container">
         
-        <!-- МЕНЮ НАВИГАЦИИ (теперь оно в самом начале, поэтому встанет СЛЕВА на ноутбуке) -->
+        <!-- это меню внизу, там кнопки чтобы переключаться между экранами -->
         <nav class="bottom-nav">
+            <!-- кнопка Главная, я поставил ей класс active, потому что она открыта сразу -->
             <a href="#" class="nav-item active" data-target="screen-home">
+                <!-- тут иконка домика и слово -->
                 <span class="material-symbols-rounded icon">home</span><span>Главная</span>
             </a>
+            <!-- кнопка Статистика -->
             <a href="#" class="nav-item" data-target="screen-stats">
                 <span class="material-symbols-rounded icon">bar_chart</span><span>Статистика</span>
             </a>
+            <!-- кнопка Календарь -->
             <a href="#" class="nav-item" data-target="screen-calendar">
                 <span class="material-symbols-rounded icon">calendar_month</span><span>Календарь</span>
             </a>
+            <!-- кнопка История -->
             <a href="#" class="nav-item" data-target="screen-history">
                 <span class="material-symbols-rounded icon">history</span><span>История</span>
             </a>
-            <!-- Кнопка плюс для добавления привычки -->
+            <!-- а это кнопка плюс, я её обернул в div чтобы можно было приподнять над меню -->
             <div class="nav-item add-btn-wrapper">
                 <button id="open-modal-btn" class="fab">
                     <span class="material-symbols-rounded">add</span>
@@ -40,44 +47,49 @@
             </div>
         </nav>
 
-        <!-- ================= ЭКРАН 1: ГЛАВНАЯ ================= -->
+        <!-- ЭКРАН 1: ГЛАВНАЯ. Тут видны все привычки -->
         <section id="screen-home" class="screen active">
+            <!-- это шапка сверху -->
             <header class="top-bar">
-                <!-- Кликабельная дата для перехода в календарь -->
+                <!-- тут дата, я сделал ей id чтобы можно было нажать и открыть календарь -->
                 <div class="date-display" id="open-calendar-btn">
-                    Сегодня, <span id="current-date"></span>
+                    Сегодня, <span id="current-date"></span> <!-- сюда js вставит сегодняшнюю дату -->
                 </div>
                 <div class="header-actions">
-                    <!-- Кнопка переключения темы -->
+                    <!-- кнопка темы, луна или солнце -->
                     <button id="theme-toggle" class="theme-btn">
                         <span class="material-symbols-rounded">dark_mode</span>
                     </button>
-                    <!-- Аватарка для перехода в профиль -->
+                    <!-- аватарка, если нажать откроется профиль -->
                     <div class="avatar" id="profile-btn">Д</div>
                 </div>
             </header>
 
+            <!-- заголовок страницы -->
             <h1 class="page-title">Привычки</h1>
 
-            <!-- Карточка с общим прогрессом -->
+            <!-- это карточка с прогрессом за сегодня -->
             <div class="progress-card">
                 <div class="progress-info">
-                    <h2 id="daily-progress-text">0/0</h2>
+                    <h2 id="daily-progress-text">0/0</h2> <!-- тут js поменяет цифры -->
                     <p>выполнено сегодня</p>
                 </div>
+                <!-- а это кружок прогресса, я его сделал через SVG, потому что так красивее -->
                 <div class="circular-progress">
                     <svg viewBox="0 0 36 36">
+                        <!-- это серый фон кружка -->
                         <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <!-- а это зелёная линия, js будет её удлинять когда привычки выполняются -->
                         <path class="circle-fill" id="progress-ring" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                     </svg>
                 </div>
             </div>
 
-            <!-- Сюда JS будет добавлять карточки привычек -->
+            <!-- вот сюда js будет вставлять карточки с привычками, тут пока пусто -->
             <main id="habits-container" class="habits-list"></main>
         </section>
 
-        <!-- ================= ЭКРАН 2: СТАТИСТИКА ================= -->
+        <!-- ЭКРАН 2: СТАТИСТИКА -->
         <section id="screen-stats" class="screen">
             <header class="top-bar">
                 <div class="date-display">Ваш прогресс</div>
@@ -88,18 +100,21 @@
 
             <div class="stats-card">
                 <div class="stats-circle-wrapper">
+                    <!-- тут большой кружок, я добавил класс large чтобы он больше был -->
                     <div class="circular-progress large">
                         <svg viewBox="0 0 36 36">
                             <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                             <path class="circle-fill green" id="stats-ring" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         </svg>
                     </div>
+                    <!-- а это текст внутри кружка, процент и подпись -->
                     <div class="stats-center-text">
                         <h2 id="stats-percentage">0%</h2>
                         <p>успешность</p>
                     </div>
                 </div>
                 
+                <!-- тут я показываю сколько выполнено а сколько пропущено -->
                 <div class="stats-legend">
                     <div class="legend-item">
                         <span class="dot green"></span>
@@ -119,10 +134,11 @@
             </div>
 
             <h3 class="section-title">Лучшие привычки</h3>
+            <!-- сюда js вставит три лучшие привычки -->
             <div id="best-habits-container" class="best-habits-list"></div>
         </section>
 
-        <!-- ================= ЭКРАН 3: КАЛЕНДАРЬ ================= -->
+        <!-- ЭКРАН 3: КАЛЕНДАРЬ -->
         <section id="screen-calendar" class="screen">
             <header class="top-bar">
                 <div class="date-display">Календарь</div>
@@ -133,17 +149,19 @@
 
             <div class="calendar-card">
                 <div class="calendar-header">
-                    <h3 id="calendar-month-year">Месяц</h3>
+                    <h3 id="calendar-month-year">Месяц</h3> <!-- сюда js вставит например "Ноябрь 2024" -->
                 </div>
+                <!-- это дни недели, они не меняются никогда -->
                 <div class="calendar-weekdays">
                     <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
                 </div>
+                <!-- а сюда js будет ставить числа месяца -->
                 <div class="calendar-days" id="calendar-days"></div>
             </div>
             <p class="calendar-hint">Зеленым отмечены дни с выполненными привычками.</p>
         </section>
 
-        <!-- ================= ЭКРАН 4: ИСТОРИЯ ================= -->
+        <!-- ЭКРАН 4: ИСТОРИЯ -->
         <section id="screen-history" class="screen">
             <header class="top-bar">
                 <div class="date-display">История</div>
@@ -152,10 +170,11 @@
 
             <h1 class="page-title">История</h1>
 
+            <!-- сюда js будет выводить что я когда выполнил -->
             <div id="history-container" class="history-list"></div>
         </section>
 
-        <!-- ================= ЭКРАН 5: ПРОФИЛЬ ================= -->
+        <!-- ЭКРАН 5: ПРОФИЛЬ -->
         <section id="screen-profile" class="screen">
             <header class="top-bar">
                 <div class="date-display">Профиль</div>
@@ -168,6 +187,7 @@
                 <h2>Даниил</h2>
                 <p class="profile-email">student@example.com</p>
                 
+                <!-- тут две циферки, сколько привычек всего и сколько раз выполнял -->
                 <div class="profile-stats-row">
                     <div class="profile-stat">
                         <h3 id="profile-total-habits">0</h3>
@@ -179,30 +199,37 @@
                     </div>
                 </div>
 
+                <!-- а это кнопка чтобы всё стереть и начать заново -->
                 <button id="reset-data-btn" class="btn-danger">Сбросить все данные</button>
             </div>
         </section>
 
-    </div> <!-- Закрываем app-container -->
+    </div> <!-- тут закрываю обёртку приложения -->
 
-    <!-- МОДАЛЬНОЕ ОКНО ДОБАВЛЕНИЯ -->
+    <!-- ОКНО ДОБАВЛЕНИЯ ПРИВЫЧКИ. Я поставил hidden, поэтому оно скрыто пока -->
     <div id="add-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-header">
+                <!-- кнопка Отмена слева -->
                 <button id="close-modal-btn" class="btn-text">Отмена</button>
+                <!-- заголовок окна, если редактирую то он меняется -->
                 <h3 id="modal-title">Новая привычка</h3>
+                <!-- кнопка Сохранить справа -->
                 <button id="save-habit-btn" class="btn-text bold">Сохранить</button>
             </div>
             
             <div class="modal-body">
+                <!-- большая иконка сверху, это просто превью что я выбрал -->
                 <div class="icon-preview" id="modal-icon-preview">
                     <span class="material-symbols-rounded">water_drop</span>
                 </div>
                 
                 <label>Название</label>
+                <!-- сюда я пишу название привычки, autocomplete выключил чтобы не мешало -->
                 <input type="text" id="habit-name-input" placeholder="Например: Пить воду" autocomplete="off">
                 
                 <label>Иконка</label>
+                <!-- это кнопки с иконками, класс active значит выбранная -->
                 <div class="icon-picker" id="icon-picker">
                     <button class="icon-option active" data-icon="water_drop"><span class="material-symbols-rounded">water_drop</span></button>
                     <button class="icon-option" data-icon="directions_run"><span class="material-symbols-rounded">directions_run</span></button>
@@ -216,26 +243,30 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ДЕЙСТВИЙ -->
+    <!-- ОКНО С ДЕЙСТВИЯМИ, оно появляется когда жму на три точки у привычки -->
     <div id="action-modal" class="modal-overlay hidden">
         <div class="modal-content action-menu">
             <div class="action-header">
+                <!-- крестик чтобы закрыть -->
                 <button id="close-action-btn" class="close-x"><span class="material-symbols-rounded">close</span></button>
                 <h3>Действия</h3>
             </div>
             <div class="action-list">
+                <!-- кнопка чтобы редактировать привычку -->
                 <button id="edit-habit-btn" class="action-item">
                     <span class="material-symbols-rounded">edit</span> Редактировать
                 </button>
+                <!-- кнопка чтобы удалить -->
                 <button id="delete-habit-btn" class="action-item danger">
                     <span class="material-symbols-rounded">delete</span> Удалить
                 </button>
+                <!-- кнопка отмена если передумал -->
                 <button id="cancel-action-btn" class="action-item cancel">Отмена</button>
             </div>
         </div>
     </div>
 
-    <!-- Подключаем наш скрипт -->
+    <!-- подключаю скрипт в самом конце, иначе он не найдёт элементы на странице -->
     <script src="script.js"></script>
 </body>
 </html>

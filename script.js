@@ -1,15 +1,19 @@
 // ==========================================
-// 1. ПОДГОТОВКА И ЗАГРУЗКА ДАННЫХ
+// 1. СТАРТ (что делаю в самом начале)
 // ==========================================
 
-// Берем сохраненные привычки из памяти браузера. Если их нет, создаем пустой массив.
+// Достаю привычки из памяти браузера.
+// В памяти лежит просто текст, поэтому JSON.parse превращает его обратно в список.
+// Если там пусто (null), ставлю пустой список [], чтобы ничего не сломалось.
 let habits = JSON.parse(localStorage.getItem('habits_v2')) || [];
 
-// Получаем сегодняшнюю дату (например, "2023-11-17")
+// Беру сегодняшнюю дату.
 let today = new Date();
+// Мне нужна дата в виде "2023-11-17" (год-месяц-день).
+// Отрезаю всё после буквы T (там время), чтобы сравнивать только дни.
 let todayStr = today.toISOString().split('T')[0];
 
-// Находим нужные элементы на странице по их ID
+// Нахожу элементы на странице по их id, чтобы потом менять текст или вешать клики.
 let container = document.getElementById('habits-container');
 let addModal = document.getElementById('add-modal');
 let actionModal = document.getElementById('action-modal');
@@ -18,51 +22,60 @@ let iconPicker = document.getElementById('icon-picker');
 let iconPreview = document.getElementById('modal-icon-preview');
 let themeToggleBtn = document.getElementById('theme-toggle');
 
-// Текущая выбранная иконка и ID привычки (если мы её редактируем)
-let selectedIcon = 'water_drop'; 
+// Тут храню две вещи:
+// 1. Какую иконку сейчас выбрал (по умолчанию капля).
+let selectedIcon = 'water_drop';
+// 2. id привычки, если редактирую. Если null — значит создаю новую.
 let currentEditId = null;
 
-// Главная функция, которая запускается при старте
+// Эта функция запускает всё приложение при открытии сайта.
 function startApp() {
-    // Выводим сегодняшнюю дату в шапку
+    // Делаю дату красивой (например, "17 ноября") и вставляю в шапку.
     let options = { day: 'numeric', month: 'long' };
     document.getElementById('current-date').textContent = today.toLocaleDateString('ru-RU', options);
     
-    setupTheme();       // Включаем темную/светлую тему
-    renderHabits();     // Рисуем карточки привычек
-    updateProgress();   // Считаем прогресс за сегодня
-    updateStatistics(); // Считаем общую статистику
-    renderCalendar();   // Рисуем календарь
-    setupNavigation();  // Включаем меню навигации
-    setupModals();      // Включаем кнопки добавления/удаления
-    setupProfile();     // Включаем кнопку сброса в профиле
+    // Включаю все части по очереди.
+    setupTheme();
+    renderHabits();
+    updateProgress();
+    updateStatistics();
+    renderCalendar();
+    setupNavigation();
+    setupModals();
+    setupProfile();
 }
 
 // ==========================================
-// 2. ПЕРЕКЛЮЧЕНИЕ ТЕМЫ (Светлая/Темная)
+// 2. ТЕМА (светлая / тёмная)
 // ==========================================
 function setupTheme() {
-    // Берем тему из памяти (по умолчанию светлая)
+    // Смотрю, какую тему выбирал в прошлый раз. Если ничего нет — ставлю светлую.
     let savedTheme = localStorage.getItem('theme') || 'light';
+    
+    // Вешаю на главный тег <html> ярлычок data-theme.
+    // В CSS уже прописано: если ярлычок "dark" — цвета меняются на тёмные.
     document.documentElement.setAttribute('data-theme', savedTheme);
     
-    // Меняем иконку на кнопке
+    // Меняю картинку на кнопке (луна или солнце).
     if (savedTheme === 'dark') {
         themeToggleBtn.innerHTML = '<span class="material-symbols-rounded">light_mode</span>';
     } else {
         themeToggleBtn.innerHTML = '<span class="material-symbols-rounded">dark_mode</span>';
     }
 
-    // Слушаем клик по кнопке темы
+    // Если нажать на кнопку темы:
     themeToggleBtn.addEventListener('click', function() {
+        // Узнаю, какая тема сейчас.
         let currentTheme = document.documentElement.getAttribute('data-theme');
-        // Меняем тему на противоположную
+        
+        // Если тёмная — ставлю светлую. Если светлая — тёмную.
         let newTheme = (currentTheme === 'dark') ? 'light' : 'dark';
         
+        // Применяю и запоминаю выбор, чтобы после обновления страницы не слетело.
         document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme); // Сохраняем выбор
+        localStorage.setItem('theme', newTheme);
         
-        // Меняем иконку
+        // Снова меняю картинку на кнопке.
         if (newTheme === 'dark') {
             themeToggleBtn.innerHTML = '<span class="material-symbols-rounded">light_mode</span>';
         } else {
@@ -72,48 +85,53 @@ function setupTheme() {
 }
 
 // ==========================================
-// 3. НАВИГАЦИЯ ПО ЭКРАНАМ
+// 3. ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
 // ==========================================
 function switchScreen(targetId) {
-    // Убираем класс 'active' у всех кнопок меню и экранов
+    // Убираю класс active у всех кнопок меню и у всех экранов.
+    // Без него экраны невидимые, а кнопки не зелёные.
     let allNavs = document.querySelectorAll('.nav-item');
     for (let i = 0; i < allNavs.length; i++) { allNavs[i].classList.remove('active'); }
     
     let allScreens = document.querySelectorAll('.screen');
     for (let i = 0; i < allScreens.length; i++) { allScreens[i].classList.remove('active'); }
     
-    // Включаем нужный экран
+    // Добавляю active только нужному экрану — он становится видимым.
     document.getElementById(targetId).classList.add('active');
     
-    // Подсвечиваем кнопку меню
+    // И подсвечиваю зелёным ту кнопку в меню, на которую нажали.
     let activeNav = document.querySelector('.nav-item[data-target="' + targetId + '"]');
     if (activeNav) { activeNav.classList.add('active'); }
 }
 
 function setupNavigation() {
-    // Находим все кнопки в нижнем меню
+    // Ищу все кнопки меню и говорю им: при клике делай вот это.
     let navItems = document.querySelectorAll('.nav-item[data-target]');
     for (let i = 0; i < navItems.length; i++) {
         navItems[i].addEventListener('click', function(e) {
-            e.preventDefault(); // Отменяем стандартный переход по ссылке
-            let target = navItems[i].getAttribute('data-target');
-            switchScreen(target);
+            // Запрещаю странице перезагружаться при клике на ссылку.
+            // Без этого приложение просто обновлялось бы каждый раз.
+            e.preventDefault();
             
-            // Обновляем данные при переходе на вкладки
+            let target = navItems[i].getAttribute('data-target'); // Смотрю, какой экран открыть.
+            switchScreen(target); // Открываю его.
+            
+            // Если открыл статистику, календарь или историю — обновляю там цифры.
             if (target === 'screen-stats') { updateStatistics(); }
             if (target === 'screen-calendar') { renderCalendar(); }
             if (target === 'screen-history') { renderHistory(); }
         });
     }
 
-    // КЛИК ПО ДАТЕ НА ГЛАВНОМ ЭКРАНЕ (НОВОЕ)
+    // Если нажать на дату в шапке — кидает в календарь.
     let dateBtn = document.getElementById('open-calendar-btn');
     dateBtn.addEventListener('click', function() {
-        switchScreen('screen-calendar'); // Переходим на вкладку календаря
-        renderCalendar();                // Обновляем календарь
+        switchScreen('screen-calendar');
+        renderCalendar();
     });
 
-    // Переход в профиль по клику на аватарку
+    // Переход в профиль при клике на аватарку.
+    // Аватарок на сайте несколько (на разных экранах), поэтому перебираю все.
     let avatars = ['profile-btn', 'profile-btn-stats', 'profile-btn-cal', 'profile-btn-hist'];
     for (let i = 0; i < avatars.length; i++) {
         let btn = document.getElementById(avatars[i]);
@@ -127,46 +145,48 @@ function setupNavigation() {
 }
 
 // ==========================================
-// 4. МОДАЛЬНЫЕ ОКНА (Добавление, Удаление)
+// 4. ОКНА (добавление / удаление / редактирование)
 // ==========================================
 function setupModals() {
-    // Клик по кнопке "Плюс"
+    // Открываю окно "Новая привычка" по клику на зелёную кнопку плюс.
     document.getElementById('open-modal-btn').addEventListener('click', function() {
-        currentEditId = null; // Сбрасываем ID (значит создаем новую)
+        currentEditId = null; // Обнуляю id — значит создаю новую.
         document.getElementById('modal-title').textContent = 'Новая привычка';
-        nameInput.value = ''; // Очищаем поле ввода
-        resetIconPicker();    // Сбрасываем иконку
-        addModal.classList.remove('hidden'); // Показываем окно
+        nameInput.value = ''; // Очищаю поле ввода.
+        resetIconPicker();    // Ставлю первую иконку.
+        addModal.classList.remove('hidden'); // Показываю окно.
     });
 
-    // Закрытие окон
+    // Кнопки закрытия окон (крестики и "Отмена").
     document.getElementById('close-modal-btn').addEventListener('click', function() { addModal.classList.add('hidden'); });
     document.getElementById('close-action-btn').addEventListener('click', function() { actionModal.classList.add('hidden'); });
     document.getElementById('cancel-action-btn').addEventListener('click', function() { actionModal.classList.add('hidden'); });
 
-    // Выбор иконки в модалке
+    // Когда кликаю на какую-то иконку в списке:
     iconPicker.addEventListener('click', function(e) {
+        // Ищу кнопку, внутри которой кликнул.
+        // closest нужен, потому что мог кликнуть на картинку, а не на кнопку.
         let btn = e.target.closest('.icon-option');
         if (btn) {
-            // Убираем рамку со всех иконок
+            // Убираю выделение со всех кнопок.
             let options = document.querySelectorAll('.icon-option');
             for (let i = 0; i < options.length; i++) { options[i].classList.remove('active'); }
             
-            // Включаем рамку для нажатой
+            // Выделяю ту, на которую нажал, и запоминаю её название.
             btn.classList.add('active');
-            selectedIcon = btn.getAttribute('data-icon'); // Берем название иконки
+            selectedIcon = btn.getAttribute('data-icon');
             
-            // Меняем большую иконку вверху
+            // Меняю большую иконку сверху.
             iconPreview.innerHTML = '<span class="material-symbols-rounded">' + selectedIcon + '</span>';
         }
     });
 
-    // Кнопка "Сохранить"
+    // Кнопка "Сохранить".
     document.getElementById('save-habit-btn').addEventListener('click', function() {
-        let name = nameInput.value.trim(); // Убираем пробелы
-        if (name === '') { alert('Введите название!'); return; }
+        let name = nameInput.value.trim(); // Беру текст, trim убирает пробелы по краям.
+        if (name === '') { alert('Введите название!'); return; } // Если пусто — не сохраняю.
 
-        // Если это редактирование старой привычки
+        // Если id не пустой — значит редактирую старую привычку. Ищу её и обновляю.
         if (currentEditId !== null) {
             for (let i = 0; i < habits.length; i++) {
                 if (habits[i].id === currentEditId) {
@@ -175,52 +195,70 @@ function setupModals() {
                 }
             }
         } else {
-            // Если создаем новую
+            // Если id пустой — создаю новую.
+            // Date.now() даёт уникальное число (время), чтобы привычки не путались.
             habits.push({ id: Date.now().toString(), name: name, icon: selectedIcon, completedDates: [] });
         }
 
-        // Сохраняем и перерисовываем всё
-        saveData(); renderHabits(); updateProgress(); updateStatistics(); renderCalendar(); renderHistory();
-        addModal.classList.add('hidden');
+        // Сохраняю и перерисовываю всё, чтобы изменения сразу были видны.
+        saveData();
+        renderHabits();
+        updateProgress();
+        updateStatistics();
+        renderCalendar();
+        renderHistory();
+        addModal.classList.add('hidden'); // Закрываю окно.
     });
 
-    // Кнопка "Удалить"
+    // Кнопка "Удалить".
     document.getElementById('delete-habit-btn').addEventListener('click', function() {
         if (confirm('Удалить привычку?')) {
+            // Создаю новый список, куда беру всех, КРОМЕ той, которую удаляю.
             let newHabits = [];
             for (let i = 0; i < habits.length; i++) {
-                if (habits[i].id !== currentEditId) { newHabits.push(habits[i]); } // Оставляем все, кроме удаляемой
+                if (habits[i].id !== currentEditId) { newHabits.push(habits[i]); }
             }
-            habits = newHabits;
-            saveData(); renderHabits(); updateProgress(); updateStatistics(); renderCalendar(); renderHistory();
-            actionModal.classList.add('hidden');
+            habits = newHabits; // Заменяю старый список на новый.
+
+            // Сохраняю и перерисовываю.
+            saveData();
+            renderHabits();
+            updateProgress();
+            updateStatistics();
+            renderCalendar();
+            renderHistory();
+            actionModal.classList.add('hidden'); // Закрываю меню.
         }
     });
 
-    // Кнопка "Редактировать"
+    // Кнопка "Редактировать".
     document.getElementById('edit-habit-btn').addEventListener('click', function() {
         let habitToEdit = null;
+        // Ищу нужную привычку по id.
         for (let i = 0; i < habits.length; i++) {
             if (habits[i].id === currentEditId) { habitToEdit = habits[i]; }
         }
         if (habitToEdit) {
+            // Вставляю её старые данные в окно.
             nameInput.value = habitToEdit.name;
             selectedIcon = habitToEdit.icon;
             iconPreview.innerHTML = '<span class="material-symbols-rounded">' + selectedIcon + '</span>';
-            
-            // Подсвечиваем нужную иконку в списке
+
+            // Подсвечиваю ту иконку, которая была выбрана.
             let options = document.querySelectorAll('.icon-option');
             for (let i = 0; i < options.length; i++) {
                 options[i].classList.remove('active');
                 if (options[i].getAttribute('data-icon') === selectedIcon) { options[i].classList.add('active'); }
             }
+            // Меняю заголовок окна и показываю его.
             document.getElementById('modal-title').textContent = 'Редактировать';
-            actionModal.classList.add('hidden'); addModal.classList.remove('hidden');
+            actionModal.classList.add('hidden');
+            addModal.classList.remove('hidden');
         }
     });
 }
 
-// Сброс иконки на каплю
+// Сбрасывает иконку на каплю, если открываю окно создания заново.
 function resetIconPicker() {
     selectedIcon = 'water_drop';
     iconPreview.innerHTML = '<span class="material-symbols-rounded">water_drop</span>';
@@ -232,12 +270,13 @@ function resetIconPicker() {
 }
 
 // ==========================================
-// 5. ОТРИСОВКА ГЛАВНОГО ЭКРАНА
+// 5. РИСУЮ ГЛАВНЫЙ ЭКРАН (карточки привычек)
 // ==========================================
 function renderHabits() {
-    container.innerHTML = ''; // Очищаем экран
+    container.innerHTML = ''; // Очищаю экран, чтобы не было дублей.
 
-        if (habits.length === 0) {
+    // Если привычек нет — показываю текст и кнопку.
+    if (habits.length === 0) {
         container.innerHTML = `
             <div style="grid-column: 1/-1; text-align: center; margin-top: 40px;">
                 <p style="color:#8e8e93; font-size: 16px; margin-bottom: 15px;">У вас пока нет привычек</p>
@@ -246,24 +285,28 @@ function renderHabits() {
                 </button>
             </div>
         `;
-        return;
+        return; // Выхожу, дальше рисовать нечего.
     }
 
-    // Перебираем все привычки
+    // Если привычки есть — беру каждую по очереди и рисую для неё карточку.
     for (let i = 0; i < habits.length; i++) {
         let habit = habits[i];
-        let isCompletedToday = habit.completedDates.includes(todayStr); // Выполнена ли сегодня?
-        let streak = calculateStreak(habit.completedDates); // Считаем серию
-        
+        // Проверяю, есть ли сегодняшняя дата в выполненных. Если да — true.
+        let isCompletedToday = habit.completedDates.includes(todayStr);
+        let streak = calculateStreak(habit.completedDates); // Считаю серию.
+
+        // Создаю блок для карточки.
         let card = document.createElement('div');
         card.className = 'habit-card';
+        // Если выполнено — добавляю класс, который делает галочку зелёной.
         if (isCompletedToday) { card.className = 'habit-card completed'; }
-        
+
+        // Если серия больше нуля — показываю огонёк.
         let streakHTML = streak > 0 ? '<span class="habit-streak-badge">🔥 ' + streak + ' дн.</span>' : '';
         let statusText = isCompletedToday ? 'Выполнено' : 'Нажмите, чтобы выполнить';
 
-        // Вставляем HTML-код карточки с иконками
-        card.innerHTML = 
+        // Собираю карточку из кусочков.
+        card.innerHTML =
             '<div class="habit-icon"><span class="material-symbols-rounded">' + habit.icon + '</span></div>' +
             '<div class="habit-info">' +
                 '<div class="habit-name">' + habit.name + ' ' + streakHTML + '</div>' +
@@ -272,31 +315,34 @@ function renderHabits() {
             '<div class="check-circle"><span class="material-symbols-rounded">check</span></div>' +
             '<button class="more-btn"><span class="material-symbols-rounded">more_vert</span></button>';
 
-        // Клик по карточке (выполнить)
+        // Если кликнуть на карточку — привычка выполнится.
         card.addEventListener('click', function(e) {
-            if (e.target.closest('.more-btn')) { return; } // Если нажали три точки, не выполняем
+            // Но если клик был по трём точкам — ничего не делаю.
+            if (e.target.closest('.more-btn')) { return; }
             toggleHabit(habit.id);
         });
 
-        // Клик по трем точкам (меню)
+        // Если кликнуть по трём точкам — открываю меню действий.
         card.querySelector('.more-btn').addEventListener('click', function(e) {
-            e.stopPropagation(); // Останавливаем клик, чтобы карточка не выполнилась
-            currentEditId = habit.id;
-            actionModal.classList.remove('hidden');
+            // Останавливаю клик, чтобы он не сработал на самой карточке.
+            e.stopPropagation();
+            currentEditId = habit.id; // Запоминаю id привычки.
+            actionModal.classList.remove('hidden'); // Показываю меню.
         });
 
-        container.appendChild(card); // Добавляем на страницу
+        container.appendChild(card); // Добавляю карточку на страницу.
     }
 }
 
 // ==========================================
-// 6. ЛОГИКА ВЫПОЛНЕНИЯ И СЕРИИ
+// 6. ВЫПОЛНЕНИЕ И СЕРИЯ
 // ==========================================
 function toggleHabit(id) {
+    // Ищу нужную привычку по id.
     for (let i = 0; i < habits.length; i++) {
         if (habits[i].id === id) {
             let habit = habits[i];
-            // Если сегодня уже выполнено - удаляем дату
+            // Если сегодняшняя дата уже есть — удаляю её (отменяю выполнение).
             if (habit.completedDates.includes(todayStr)) {
                 let newDates = [];
                 for (let j = 0; j < habit.completedDates.length; j++) {
@@ -304,74 +350,92 @@ function toggleHabit(id) {
                 }
                 habit.completedDates = newDates;
             } else {
-                // Если нет - добавляем сегодняшнюю дату
+                // Если нет — добавляю сегодняшнюю дату.
                 habit.completedDates.push(todayStr);
             }
         }
     }
+    // Сохраняю и перерисовываю, чтобы всё обновилось.
     saveData(); renderHabits(); updateProgress(); renderCalendar(); renderHistory();
 }
 
-// Считаем серию (сколько дней подряд)
+// Считаю серию (сколько дней подряд).
 function calculateStreak(dates) {
-    if (dates.length === 0) { return 0; }
+    if (dates.length === 0) { return 0; } // Если ничего нет — серия 0.
     let streak = 0;
-    let checkDate = new Date();
+    let checkDate = new Date(); // Начинаю с сегодняшнего дня.
+
+    // Кручу цикл, пока не найду день, когда привычка не выполнялась.
     while (true) {
         let dateStr = checkDate.toISOString().split('T')[0];
+
         if (dates.includes(dateStr)) {
-            streak++; checkDate.setDate(checkDate.getDate() - 1); // Шагаем на день назад
+            streak++; // Нашёл выполненный день — плюс один.
+            checkDate.setDate(checkDate.getDate() - 1); // Отматываю на день назад.
         } else {
+            // Если сегодня не выполнено, проверяю вчера (вдруг сегодня просто не нажали).
             if (streak === 0) {
                 checkDate.setDate(checkDate.getDate() - 1);
                 let yesterday = checkDate.toISOString().split('T')[0];
-                if (!dates.includes(yesterday)) { break; } // Если и вчера не было, серия прервалась
-            } else { break; }
+                if (!dates.includes(yesterday)) { break; } // И вчера нет — серия прервалась.
+            } else { break; } // Серия уже считается, но нашли пропуск — выхожу.
         }
     }
     return streak;
 }
 
 // ==========================================
-// 7. ОБНОВЛЕНИЕ ПРОГРЕССА И СТАТИСТИКИ
+// 7. ПРОГРЕСС И СТАТИСТИКА
 // ==========================================
 function updateProgress() {
-    let total = habits.length;
-    let completedToday = 0;
+    let total = habits.length; // Всего привычек.
+    let completedToday = 0;    // Сколько выполнено сегодня.
+
+    // Считаю выполненные сегодня.
     for (let i = 0; i < habits.length; i++) {
         if (habits[i].completedDates.includes(todayStr)) { completedToday++; }
     }
+
+    // Меняю текст на экране (например, "2/5").
     document.getElementById('daily-progress-text').textContent = completedToday + '/' + total;
-    
-    // Высчитываем процент для круга
+
+    // Считаю процент: (выполнено / всего) * 100. Если привычек нет — 0.
     let percent = total > 0 ? (completedToday / total) * 100 : 0;
+    // Меняю длину зелёной линии в кружке.
     document.getElementById('progress-ring').setAttribute('stroke-dasharray', percent + ', 100');
 }
 
 function updateStatistics() {
     let totalCompleted = 0;
-    let totalPossible = habits.length * 30; // Условно 30 дней
+    let totalPossible = habits.length * 30; // Условно считаю, что за 30 дней.
+
+    // Считаю общее количество выполнений.
     for (let i = 0; i < habits.length; i++) { totalCompleted += habits[i].completedDates.length; }
+
     let percent = totalPossible > 0 ? Math.round((totalCompleted / totalPossible) * 100) : 0;
-    
+
+    // Меняю цифры и кружок на экране статистики.
     document.getElementById('stats-percentage').textContent = percent + '%';
     document.getElementById('stats-ring').setAttribute('stroke-dasharray', percent + ', 100');
     document.getElementById('stats-completed').textContent = totalCompleted;
     document.getElementById('stats-skipped').textContent = totalPossible - totalCompleted;
 
-    // Сортируем привычки по количеству выполнений (для топа)
+    // Делаю топ-3 лучших привычек.
+    // slice() копирует список, чтобы сортировка не сломала habits.
     let sorted = habits.slice();
+    // Сортирую: у кого больше выполнений — тот выше.
     sorted.sort(function(a, b) { return b.completedDates.length - a.completedDates.length; });
-    let top3 = sorted.slice(0, 3); // Берем первые 3
+    let top3 = sorted.slice(0, 3); // Беру первые три.
 
     let containerBest = document.getElementById('best-habits-container');
-    containerBest.innerHTML = '';
+    containerBest.innerHTML = ''; // Очищаю контейнер.
 
+    // Рисую топ-3.
     for (let i = 0; i < top3.length; i++) {
         let h = top3[i];
         let item = document.createElement('div');
         item.className = 'best-habit-item';
-        item.innerHTML = 
+        item.innerHTML =
             '<div class="habit-icon"><span class="material-symbols-rounded">' + h.icon + '</span></div>' +
             '<div class="info"><h4>' + h.name + '</h4><p>Выполнено ' + h.completedDates.length + ' раз</p></div>' +
             '<div class="percent">' + (h.completedDates.length * 3) + '%</div>';
@@ -383,27 +447,32 @@ function updateStatistics() {
 // 8. КАЛЕНДАРЬ
 // ==========================================
 function renderCalendar() {
-    let year = today.getFullYear();
-    let month = today.getMonth();
+    let year = today.getFullYear(); // Текущий год.
+    let month = today.getMonth();   // Текущий месяц (0 — январь, 11 — декабрь).
+
+    // Массив с названиями месяцев, чтобы выводить красиво.
     let months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
     document.getElementById('calendar-month-year').textContent = months[month] + ' ' + year;
 
+    // Узнаю, с какого дня недели начинается месяц.
     let firstDay = new Date(year, month, 1);
-    let startDayIndex = firstDay.getDay(); // День недели первого числа
-    if (startDayIndex === 0) { startDayIndex = 7; } // Делаем понедельник первым
-    
-    let daysInMonth = new Date(year, month + 1, 0).getDate(); // Сколько дней в месяце
-    let daysContainer = document.getElementById('calendar-days');
-    daysContainer.innerHTML = '';
+    let startDayIndex = firstDay.getDay(); // 0 — воскресенье, 1 — понедельник...
+    if (startDayIndex === 0) { startDayIndex = 7; } // Делаю понедельник первым.
 
-    // Добавляем пустые клетки до первого числа
+    // Хитрость: чтобы узнать количество дней в месяце, запрашиваю "0-й день" следующего.
+    let daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    let daysContainer = document.getElementById('calendar-days');
+    daysContainer.innerHTML = ''; // Очищаю сетку.
+
+    // Рисую пустые клетки до первого числа месяца.
     for (let i = 1; i < startDayIndex; i++) {
         let emptyDiv = document.createElement('div');
         emptyDiv.className = 'cal-day';
         daysContainer.appendChild(emptyDiv);
     }
 
-    // Собираем все даты, когда были выполнены привычки
+    // Собираю все даты, когда выполнялись привычки, в один список для проверки.
     let allDates = [];
     for (let i = 0; i < habits.length; i++) {
         for (let j = 0; j < habits[i].completedDates.length; j++) {
@@ -411,20 +480,23 @@ function renderCalendar() {
         }
     }
 
-    // Рисуем числа месяца
+    // Рисую сами числа месяца.
     for (let i = 1; i <= daysInMonth; i++) {
         let dayDiv = document.createElement('div');
         dayDiv.className = 'cal-day';
         dayDiv.textContent = i;
-        
-        // Форматируем дату (ГГГГ-ММ-ДД)
+
+        // Собираю дату в формате "2023-11-05".
+        // padStart добавляет ноль в начало, если число меньше 10 ("5" станет "05").
         let fMonth = (month + 1).toString().padStart(2, '0');
         let fDay = i.toString().padStart(2, '0');
         let fullDate = year + '-' + fMonth + '-' + fDay;
-        
-        if (allDates.includes(fullDate)) { dayDiv.classList.add('has-habit'); } // Если были привычки - зеленый
-        if (fullDate === todayStr) { dayDiv.classList.add('today'); } // Обводка для сегодня
-        
+
+        // Если такой день есть в выполненных — крашу зелёным.
+        if (allDates.includes(fullDate)) { dayDiv.classList.add('has-habit'); }
+        // Если это сегодня — делаю обводку.
+        if (fullDate === todayStr) { dayDiv.classList.add('today'); }
+
         daysContainer.appendChild(dayDiv);
     }
 }
@@ -434,44 +506,48 @@ function renderCalendar() {
 // ==========================================
 function renderHistory() {
     let historyContainer = document.getElementById('history-container');
-    historyContainer.innerHTML = ''; 
+    historyContainer.innerHTML = '';
 
-    let allCompletedTasks = []; 
-    
-    // Собираем ВСЕ выполненные привычки со всех карточек
+    let allCompletedTasks = [];
+
+    // Собираю все выполненные дела в один список.
     for (let i = 0; i < habits.length; i++) {
         let habit = habits[i];
         for (let j = 0; j < habit.completedDates.length; j++) {
             let date = habit.completedDates[j];
+            // Сохраняю дату, название и иконку, чтобы потом красиво вывести.
             allCompletedTasks.push({ date: date, name: habit.name, icon: habit.icon });
         }
     }
 
-    // Если ничего нет - выводим текст
+    // Если ничего нет — показываю "пусто".
     if (allCompletedTasks.length === 0) {
         historyContainer.innerHTML = '<div class="empty-history">Здесь пока пусто. Выполните первую привычку!</div>';
         return;
     }
 
-    // Сортируем от новых к старым
+    // Сортирую: сначала самые новые (b - a).
     allCompletedTasks.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
 
-    // Группируем по датам
+    // Раскладываю дела по датам.
+    // Делаю объект, где ключ — дата, а значение — список дел за этот день.
     let groupedByDate = {};
     for (let i = 0; i < allCompletedTasks.length; i++) {
         let task = allCompletedTasks[i];
+        // Если такой даты ещё нет — создаю для неё пустой список.
         if (!groupedByDate[task.date]) { groupedByDate[task.date] = []; }
         groupedByDate[task.date].push(task);
     }
 
+    // Получаю список всех дат.
     let uniqueDates = Object.keys(groupedByDate);
 
-    // Рисуем карточки по датам
+    // Для каждой даты создаю карточку.
     for (let i = 0; i < uniqueDates.length; i++) {
         let dateStr = uniqueDates[i];
         let dateObj = new Date(dateStr);
         let options = { day: 'numeric', month: 'long' };
-        let prettyDate = dateObj.toLocaleDateString('ru-RU', options); // Красивая дата
+        let prettyDate = dateObj.toLocaleDateString('ru-RU', options); // Красивая дата.
 
         let card = document.createElement('div');
         card.className = 'history-card';
@@ -484,13 +560,13 @@ function renderHistory() {
         let itemsContainer = document.createElement('div');
         itemsContainer.className = 'history-items';
 
-        // Выводим привычки за этот день
+        // Достаю дела за этот день.
         let tasksOfDay = groupedByDate[dateStr];
         for (let j = 0; j < tasksOfDay.length; j++) {
             let task = tasksOfDay[j];
             let item = document.createElement('div');
             item.className = 'history-item';
-            item.innerHTML = 
+            item.innerHTML =
                 '<div class="history-icon"><span class="material-symbols-rounded">' + task.icon + '</span></div>' +
                 '<span>' + task.name + '</span>';
             itemsContainer.appendChild(item);
@@ -505,11 +581,11 @@ function renderHistory() {
 // 10. ПРОФИЛЬ И СОХРАНЕНИЕ
 // ==========================================
 function setupProfile() {
-    // Кнопка сброса
+    // Кнопка "Сбросить всё".
     document.getElementById('reset-data-btn').addEventListener('click', function() {
         if (confirm('Удалить ВСЕ привычки?')) {
-            localStorage.removeItem('habits_v2');
-            location.reload();
+            localStorage.removeItem('habits_v2'); // Стираю данные из памяти браузера.
+            location.reload(); // Перезагружаю страницу — всё как в начале.
         }
     });
 }
@@ -517,15 +593,20 @@ function setupProfile() {
 function updateProfileStats() {
     let totalHabits = habits.length;
     let totalCompletions = 0;
+    // Считаю общее количество выполнений.
     for (let i = 0; i < habits.length; i++) { totalCompletions += habits[i].completedDates.length; }
+
+    // Меняю цифры на экране профиля.
     document.getElementById('profile-total-habits').textContent = totalHabits;
     document.getElementById('profile-total-completions').textContent = totalCompletions;
 }
 
-// Сохранение в localStorage
-function saveData() { 
-    localStorage.setItem('habits_v2', JSON.stringify(habits)); 
+// Сохраняю данные в память браузера.
+function saveData() {
+    // Память браузера хранит только текст.
+    // JSON.stringify превращает мои данные в текст, чтобы их можно было сохранить.
+    localStorage.setItem('habits_v2', JSON.stringify(habits));
 }
 
-// Запуск приложения!
+// Запускаю приложение!
 startApp();
